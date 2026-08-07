@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Modulo 02 - Recria a infraestrutura do modulo 01 (EC2 + Security Group + nginx)
+  de forma declarativa via CloudFormation.
+
+Parameters:
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Description: ID da subnet publica onde a instancia sera criada
+
+  MeuIP:
+    Type: String
+    Description: Seu IP publico para acesso SSH (formato x.x.x.x/32)
+
+  NomeDaChave:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Nome do par de chaves SSH ja existente na sua conta
+
+Resources:
+  MeuSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Permite SSH restrito e HTTP publico
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref MeuIP
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+  MinhaInstancia:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t3.micro
+      ImageId: '{{resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64}}'
+      KeyName: !Ref NomeDaChave
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !GetAtt MeuSecurityGroup.GroupId
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          dnf update -y
+          dnf install -y nginx
+          systemctl start nginx
+          systemctl enable nginx
+
+Outputs:
+  IPPublico:
+    Description: IP publico da instancia criada
+    Value: !GetAtt MinhaInstancia.PublicIp
+
+  URLServidor:
+    Description: URL para acessar o servidor nginx
+    Value: !Sub 'http://${MinhaInstancia.PublicIp}'
