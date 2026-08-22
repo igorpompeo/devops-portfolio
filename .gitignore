@@ -1,0 +1,14 @@
+# Estado do Terraform — contém detalhes de todos os recursos gerenciados,
+# nunca deve ir pro Git (equivalente a vazar a "planta baixa" da infra toda)
+*.tfstate
+*.tfstate.*
+
+# Diretório local de plugins/providers baixados (NÃO o .lock.hcl, esse commita)
+.terraform/
+
+# Valores que podem variar por pessoa/ambiente, nunca commitados
+*.tfvars
+!*.tfvars.example
+
+# Logs de crash do Terraform
+crash.log
