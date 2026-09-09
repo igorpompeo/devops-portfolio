@@ -1,0 +1,16 @@
+package main
+
+import (
+	"fmt"
+	"net/http"
+)
+
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "OK")
+}
+
+func main() {
+	http.HandleFunc("/health", healthHandler)
+	fmt.Println("Servidor rodando na porta 8080...")
+	http.ListenAndServe(":8080", nil)
+}
