@@ -8,3 +8,8 @@ variable "region" {
   type        = string
   default     = "eu-frankfurt-1"
 }
+
+variable "tenancy_ocid" {
+  description = "OCID da tenancy OCI (raiz da conta) - necessário para data sources que não aceitam compartment_id de um subcompartment"
+  type        = string
+}

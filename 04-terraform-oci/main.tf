@@ -159,3 +159,55 @@ resource "oci_core_subnet" "private" {
   security_list_ids          = [oci_core_security_list.private.id]
   prohibit_public_ip_on_vnic = true
 }
+
+# =============================================================================
+# OKE
+# =============================================================================
+
+data "oci_identity_availability_domain" "ad1" {
+  compartment_id = var.tenancy_ocid   # atenção: tenancy_ocid, não compartment_ocid
+  ad_number      = 1
+}
+
+resource "oci_containerengine_cluster" "portfolio_oke" {
+  compartment_id             = var.compartment_ocid
+  kubernetes_version         = "v1.34.10" 
+  name                       = "devops-portfolio-oke"
+  vcn_id                     = oci_core_vcn.main.id
+
+  endpoint_config {
+    is_public_ip_enabled     = true
+    subnet_id                = oci_core_subnet.public.id
+  }
+
+  cluster_pod_network_options {
+    cni_type = "FLANNEL_OVERLAY" # tipo de rede por não ter necessidade de escalonamento (apenas estudo)
+  }
+}
+
+resource "oci_containerengine_node_pool" "portfolio_oke_pool" {
+  cluster_id                 = oci_containerengine_cluster.portfolio_oke.id
+  compartment_id             = var.compartment_ocid
+  kubernetes_version         = "v1.34.10"
+  name                       = "portfolio-node-pool"
+  node_shape                 = "VM.Standard.A1.Flex"
+
+  node_source_details {
+    image_id    = "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaa7ruim65pzodjcirutykxzlxw7vbitcbijmy5pbhnyfpjrj3pmspa"
+    source_type = "IMAGE"
+  }
+
+  node_shape_config {
+    ocpus                    = 1 # metade do teto Always Free (4 OCPUS total)
+    memory_in_gbs            = 6 # metade do teto Always Free (24GB total)
+  }
+
+  node_config_details {
+    size                     = 1 # 1 node para começar
+
+    placement_configs {
+      availability_domain    = data.oci_identity_availability_domain.ad1.name
+      subnet_id              = oci_core_subnet.private.id
+    }
+  }
+}
