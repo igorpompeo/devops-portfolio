@@ -13,8 +13,8 @@ trás de cada escolha.
 | 01 | [Fundamentos AWS](./01-fundamentos-aws) | ✅ Completo | VPC, EC2, IAM/MFA, Security Groups — provisionamento manual como base para IaC |
 | 02 | [CloudFormation](./02-cloudformation) | ✅ Completo | Template do zero, debugging real (`!Ref` vs `!GetAtt`), deploy via AWS CLI |
 | 03 | [GitOps (Argo CD)](./03-gitops) | ✅ Completo | Sync policies, drift e self-healing testados na prática, exposição direta em projeto de cliente |
-| 04 | [Terraform (OCI)](./04-terraform-oci) | 🚧 Em andamento | IaC multi-cloud — rede provisionada; cluster Kubernetes gerenciado (OKE) em progresso |
-| 05 | CI/CD completo | 🔜 Planejado | Pipeline que builda imagem, publica no registry, e atualiza o Git automaticamente |
+| 04 | [Terraform (OCI)](./04-terraform-oci) | ✅ Completo | IaC multi-cloud — rede provisionada, cluster Kubernetes gerenciado (OKE) com node pool ARM, scale-down sob demanda para controle de cota Always Free |
+| 05 | [CI/CD completo](./05-cicd-app) | 🚧 Em andamento | Pipeline GitHub Actions (teste → build → publish no GHCR) funcionando; deploy no cluster `kind` pendente |
 | 06 | GitOps avançado | 🔜 Planejado | Multi-ambiente (dev/staging/prod), Helm/Kustomize, ApplicationSets |
 
 ## Sobre
