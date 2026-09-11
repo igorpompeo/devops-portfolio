@@ -14,8 +14,8 @@ trás de cada escolha.
 | 02 | [CloudFormation](./02-cloudformation) | ✅ Completo | Template do zero, debugging real (`!Ref` vs `!GetAtt`), deploy via AWS CLI |
 | 03 | [GitOps (Argo CD)](./03-gitops) | ✅ Completo | Sync policies, drift e self-healing testados na prática, exposição direta em projeto de cliente |
 | 04 | [Terraform (OCI)](./04-terraform-oci) | ✅ Completo | IaC multi-cloud — rede provisionada, cluster Kubernetes gerenciado (OKE) com node pool ARM, scale-down sob demanda para controle de cota Always Free |
-| 05 | [CI/CD completo](./05-cicd-app) | 🚧 Em andamento | Pipeline GitHub Actions (teste → build → publish no GHCR) funcionando; deploy no cluster `kind` pendente |
-| 06 | GitOps avançado | 🔜 Planejado | Multi-ambiente (dev/staging/prod), Helm/Kustomize, ApplicationSets |
+| 05 | [CI/CD completo](./05-cicd-app) | ✅ Completo | Pipeline GitHub Actions (teste → build → publish no GHCR) e deploy manual validado no cluster `kind` |
+| 06 | GitOps avançado | 🚧 Em andamento | Conectar o deploy do Módulo 05 ao Argo CD (Módulo 03), substituindo `kubectl apply` manual por sincronização GitOps, com suporte a múltiplos ambientes via Helm ou Kustomize |
 
 ## Sobre
 
