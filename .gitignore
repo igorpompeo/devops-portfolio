@@ -12,3 +12,7 @@
 
 # Logs de crash do Terraform
 crash.log
+
+# Memória de mentoria do Claude Code - processo de estudo pessoal,
+# não faz parte do portfólio técnico entregue
+/CLAUDE.md
