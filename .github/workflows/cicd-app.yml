@@ -3,15 +3,26 @@ name: CI - 05-cicd-app
 on:
   push:
     branches: [main]
-    paths:
-      - '05-cicd-app/**'
   pull_request:
     branches: [main]
-    paths:
-      - '05-cicd-app/**'
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      cicd: ${{ steps.filter.outputs.cicd }}
+    steps:
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            cicd:
+              - '05-cicd-app/**'
   test:
+    needs: changes
+    if: needs.changes.outputs.cicd == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout do código

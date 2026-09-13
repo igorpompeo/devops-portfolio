@@ -80,6 +80,14 @@ Ao abrir um PR, nenhum status check aparecia — o GitHub Actions não disparava
 
 **Solução:** remover temporariamente o required status check nas configurações da branch (`Settings → Branches → editar regra`), mergear o PR que adicionava o trigger `pull_request` ao workflow, e recolocar o check obrigatório. A partir desse ponto o ciclo passou a funcionar: PR aberto → job `test` roda no contexto da branch → check verde → merge liberado.
 
+### Mesmo deadlock, causa diferente: filtro de `paths` no trigger
+
+Ao revisar o pipeline após a correção do trigger `pull_request` (erro anterior), ficou claro que o problema podia se repetir de outra forma: o workflow ainda tinha `paths: ['05-cicd-app/**']` no gatilho. Qualquer PR que não tocasse nada dentro de `05-cicd-app/` (ex.: só o `README.md` da raiz) faria o GitHub nem agendar a execução do job `test` — e, com o check `test` marcado como obrigatório na proteção de branch, o PR ficaria pendurado esperando um status que nunca seria reportado.
+
+**Causa raiz:** filtro de `paths` no nível do trigger do workflow decide se a execução acontece ou não. Quando não acontece, o check exigido pela branch protection não tem como ser satisfeito — o GitHub não distingue "não se aplica" de "ainda não rodou".
+
+**Solução:** mover o filtro de `paths` do trigger para dentro de um job dedicado (`changes`), usando `dorny/paths-filter`, e condicionar o job `test` ao resultado desse filtro via `if: needs.changes.outputs.cicd == 'true'`. O workflow agora sempre dispara em qualquer PR para a `main`; quando a mudança não afeta `05-cicd-app/`, o job `test` aparece como `skipped` — e um job skipped conta como aprovado para efeito de required status check, liberando o merge normalmente.
+
 ### Push recusado por PAT sem escopo `workflow`
 
 ! [remote rejected] ci/fix-workflow-pull-request-trigger -> ci/fix-workflow-pull-request-trigger (refusing to allow a Personal Access Token to create or update workflow `.github/workflows/cicd-app.yml` without `workflow` scope)
