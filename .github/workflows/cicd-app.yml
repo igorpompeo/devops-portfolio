@@ -14,6 +14,7 @@ jobs:
     outputs:
       cicd: ${{ steps.filter.outputs.cicd }}
     steps:
+      - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
         id: filter
         with:
