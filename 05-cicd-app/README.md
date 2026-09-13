@@ -88,6 +88,18 @@ Ao revisar o pipeline após a correção do trigger `pull_request` (erro anterio
 
 **Solução:** mover o filtro de `paths` do trigger para dentro de um job dedicado (`changes`), usando `dorny/paths-filter`, e condicionar o job `test` ao resultado desse filtro via `if: needs.changes.outputs.cicd == 'true'`. O workflow agora sempre dispara em qualquer PR para a `main`; quando a mudança não afeta `05-cicd-app/`, o job `test` aparece como `skipped` — e um job skipped conta como aprovado para efeito de required status check, liberando o merge normalmente.
 
+### Job `changes` falhando com exit code 128 no `dorny/paths-filter`
+
+```
+Run dorny/paths-filter@v3
+Get current git ref
+Error: The process '/usr/bin/git' failed with exit code 128
+```
+
+**Causa raiz:** ao mover o filtro de `paths` do trigger para dentro do job `changes` (ver erro anterior), o job passou a depender de comandos `git` executados internamente pelo `dorny/paths-filter` para comparar os arquivos alterados — mas o job não tinha nenhum `actions/checkout` antes dele. Sem checkout, o workspace do runner não tem diretório `.git`, e o comando `git` interno da action falha por não haver repositório ali.
+
+**Solução:** adicionar `actions/checkout@v4` como primeiro step do job `changes`, antes do `dorny/paths-filter@v3`.
+
 ### Push recusado por PAT sem escopo `workflow`
 
 ! [remote rejected] ci/fix-workflow-pull-request-trigger -> ci/fix-workflow-pull-request-trigger (refusing to allow a Personal Access Token to create or update workflow `.github/workflows/cicd-app.yml` without `workflow` scope)
